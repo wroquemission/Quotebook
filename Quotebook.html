@@ -391,6 +391,7 @@
     </script>
 
     <script>
+
         const mainView = document.querySelector('#main-view');
         const detailsView = document.querySelector('#details-view');
         const addView = document.querySelector('#add-view');
@@ -400,6 +401,8 @@
 
         const quoteButton = document.querySelector('#quote-button');
         const settingsButton = document.querySelector('#settings-button');
+
+        const searchInput = document.querySelector('#search-input');
 
         const confirmationView = document.querySelector('#confirmation-view');
 
@@ -520,13 +523,28 @@
                 this.saveStorage();
             }
 
-            loadList(list) {
+            loadList(list, query) {
+                this.quotes = {};
+
                 list.forEach(item => {
-                    this.addQuote(item);
+                    const matches = [
+                        item.author,
+                        item.reference,
+                        item.text,
+                        item.link,
+                        item.category,
+                        item.subcategory
+                    ].some(field => {
+                        return new RegExp(query, 'ig').test(field);
+                    });
+
+                    if (!query || matches) {
+                        this.addQuote(item);
+                    }
                 });
             }
 
-            loadStorage() {
+            loadStorage(query) {
                 const storage = window.localStorage.getItem('quotebook-library');
                 let data;
                 
@@ -536,7 +554,7 @@
                     data = [];
                 }
 
-                this.loadList(data);
+                this.loadList(data, query);
             }
 
             saveStorage() {
@@ -776,8 +794,9 @@
                     },
                     eventListener: ['change', () => {
                         this.category = categoryInput.value || 'misc';
-                        this.library.renderList();
                         this.library.saveStorage();
+                        this.library.loadStorage();
+                        this.library.renderList();
                     }]
                 });
 
@@ -796,8 +815,9 @@
                     },
                     eventListener: ['change', () => {
                         this.subcategory = subcategoryInput.value || 'misc';
-                        this.library.renderList();
                         this.library.saveStorage();
+                        this.library.loadStorage();
+                        this.library.renderList();
                     }]
                 });
 
@@ -1042,6 +1062,11 @@
 
             addView.classList.remove('hide');
             mainView.classList.add('hide');
+        }, false);
+
+        searchInput.addEventListener('keyup', () => {
+            library.loadStorage(searchInput.value);
+            library.renderList();
         }, false);
 
         function confirmPrompt(header, yesLabel, noLabel) {
