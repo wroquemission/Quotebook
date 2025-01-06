@@ -131,6 +131,55 @@
             display: none !important;
         }
 
+        .details-input {
+            box-sizing: border-box;
+            width: 80%;
+            height: 2.6em;
+            background: #f8f8f8;
+            color: #000;
+            font-family: 'Open Sans', 'Helvetica', sans-serif;
+            border: none;
+            border-left: solid 0.17em #b5b5b5;
+            padding: 0em 1em;
+            font-family: 'Times New Roman', serif;
+            font-size: 1.4em;
+        }
+
+        .details-input:focus {
+            border: solid .1em #000;
+            background: #fff;
+            font-family: 'Open Sans', 'Helvetica', sans-serif;
+        }
+
+        .details-textarea {
+            box-sizing: border-box;
+            width: 80%;
+            background: #f8f8f8;
+            font-size: 1.4em;
+            color: #000;
+            font-family: 'Times New Roman', serif;
+            line-height: 1.5em;
+            border: none;
+            border-left: solid 0.17em #b5b5b5;
+            padding: 1em 1em !important;
+        }
+
+        .details-textarea:focus {
+            background: #fff;
+            border: solid .12em #000 !important;
+            font-family: 'Open Sans', 'Helvetica', sans-serif;
+        }
+
+        .details-input-label {
+            font-size: 2.4em;
+            font-weight: 400;
+            color: #000;
+            margin-top: 1em;
+            margin-bottom: .5em;
+            text-align: left;
+            width: 80%;
+        }
+
         .add-input {
             box-sizing: border-box;
             width: 80%;
@@ -202,17 +251,19 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            padding-top: 3em;
+            padding-bottom: 3em;
         }
 
-        #details-delete {
-            min-width: 92%;
+        .details-delete {
+            width: 80%;
             height: 2.5em;
             border: none;
             outline: none;
-            border-radius: .4em;
             font-size: 1.2em;
             background: #ff5757;
             color: white;
+            margin-top: 2em;
         }
 
         #details-delete-wrapper {
@@ -248,9 +299,31 @@
         }
 
         #confirmation-header {
+            font-family: 'Open Sans', 'Helvetica', sans-serif;
             font-size: 2.2em;
             font-weight: 400;
             color: #737373;
+        }
+
+        .save-discard-buttons button {
+            font-size: 1.3em;
+            width: 6em;
+            height: 2.3em;
+            margin: .7em;
+            border-radius: .3em;
+            font-weight: 400;
+        }
+
+        .save-button {
+            border: solid .15em #737373;
+            background: white;
+            color: #636363;
+        }
+
+        .discard-button {
+            border: solid .15em #ff5757;
+            background: #ff5757;
+            color: white;
         }
 
         #add-view {
@@ -405,7 +478,19 @@
             }
 
             removeQuote(quote) {
-                delete this.quotes[quote.category][quote.subcategory];
+                const { category, subcategory } = quote;
+
+                const list = this.quotes[category][subcategory];
+
+                list.splice(list.indexOf(quote), 1);
+
+                if (!list.length) {
+                    delete this.quotes[category][subcategory];
+                }
+
+                if (!Object.keys(this.quotes[category]).length) {
+                    delete this.quotes[category];
+                }
 
                 this.saveStorage();
             }
@@ -503,14 +588,14 @@
             renderRow() {
                 const rowElement = createElement('DIV', {
                     parent: quotesList,
-                    eventListener: ['click', this.renderDetails.bind(this)],
                     elementClass: 'quote'
                 });
 
                 createElement('DIV', {
                     parent: rowElement,
                     elementClass: 'quote-text',
-                    text: this.text
+                    text: this.text,
+                    eventListener: ['click', this.renderDetails.bind(this)],
                 });
 
                 const reference = createElement('DIV', {
@@ -551,15 +636,7 @@
             }
 
             renderDetails() {
-                currentTransaction = this;
-                returnView = detailsView;
-
-                    // author: author,
-                    // reference: reference,
-                    // text: text,
-                    // link: link,
-                    // category: category,
-                    // subcategory: subcategory
+                window.scrollTo(0, 0);
 
                 while (detailsView.firstChild) {
                     detailsView.firstChild.remove();
@@ -570,16 +647,147 @@
                     ID: 'details-back-arrow',
                     text: '&#8592;',
                     eventListener: ['click', () => {
-                        this.ledger.refresh();
+                        this.library.renderList();
+
+                        window.scrollTo(0, 0);
 
                         detailsView.classList.add('hide');
-                        returnView.classList.remove('hide');
-
-                        returnView = mainView;
-
-                        mainView.scrollTo(0, 0);
+                        mainView.classList.remove('hide');
                     }]
                 });
+
+                createElement('H1', {
+                    parent: detailsView,
+                    text: 'Author',
+                    elementClass: 'details-input-label'
+                });
+
+                const authorInput = createElement('INPUT', {
+                    parent: detailsView,
+                    elementClass: 'details-input',
+                    attributes: {
+                        type: 'text',
+                        value: this.author
+                    },
+                    eventListener: ['change', () => {
+                        this.author = authorInput.value;
+                        this.library.saveStorage();
+                    }]
+                });
+
+                createElement('H1', {
+                    parent: detailsView,
+                    text: 'Reference',
+                    elementClass: 'details-input-label'
+                });
+
+                const referenceInput = createElement('INPUT', {
+                    parent: detailsView,
+                    elementClass: 'details-input',
+                    attributes: {
+                        type: 'text',
+                        value: this.reference
+                    },
+                    eventListener: ['change', () => {
+                        this.reference = referenceInput.value;
+                        this.library.saveStorage();
+                    }]
+                });
+
+                createElement('H1', {
+                    parent: detailsView,
+                    text: 'Quote',
+                    elementClass: 'details-input-label'
+                });
+
+                const quoteInput = createElement('TEXTAREA', {
+                    parent: detailsView,
+                    elementClass: 'details-textarea',
+                    attributes: {
+                        rows: 4
+                    },
+                    text: this.text,
+                    eventListener: ['change', () => {
+                        this.text = quoteInput.value;
+                        this.library.saveStorage();
+                    }]
+                });
+
+                createElement('H1', {
+                    parent: detailsView,
+                    text: 'Link',
+                    elementClass: 'details-input-label'
+                });
+
+                const linkInput = createElement('INPUT', {
+                    parent: detailsView,
+                    elementClass: 'details-input',
+                    attributes: {
+                        type: 'text',
+                        value: this.link
+                    },
+                    eventListener: ['change', () => {
+                        this.link = linkInput.value;
+                        this.library.saveStorage();
+                    }]
+                });
+
+                createElement('H1', {
+                    parent: detailsView,
+                    text: 'Category',
+                    elementClass: 'details-input-label'
+                });
+
+                const categoryInput = createElement('INPUT', {
+                    parent: detailsView,
+                    elementClass: 'details-input',
+                    attributes: {
+                        type: 'text',
+                        value: this.category === 'misc' ? '' : this.category
+                    },
+                    eventListener: ['change', () => {
+                        this.category = categoryInput.value || 'misc';
+                        this.library.saveStorage();
+                    }]
+                });
+
+                createElement('H1', {
+                    parent: detailsView,
+                    text: 'Subcategory',
+                    elementClass: 'details-input-label'
+                });
+
+                const subcategoryInput = createElement('INPUT', {
+                    parent: detailsView,
+                    elementClass: 'details-input',
+                    attributes: {
+                        type: 'text',
+                        value: this.subcategory === 'misc' ? '' : this.subcategory
+                    },
+                    eventListener: ['change', () => {
+                        this.subcategory = subcategoryInput.value || 'misc';
+                        this.library.saveStorage();
+                    }]
+                });
+
+                createElement('BUTTON', {
+                    parent: detailsView,
+                    elementClass: 'details-delete',
+                    text: 'Delete',
+                    eventListener: ['click', () => {
+                        confirmPrompt('Are you sure?', 'Yes', 'No').then(response => {
+                            if (response) {
+                                this.library.removeQuote(this);
+                                this.library.renderList();
+
+                                mainView.classList.remove('hide');
+                                detailsView.classList.add('hide');
+                            }
+                        });
+                    }]
+                });
+
+                window.scrollTo(0, 0);
 
                 mainView.classList.add('hide');
                 detailsView.classList.remove('hide');
@@ -705,6 +913,8 @@
                         library.renderList();
                     }
 
+                    window.scrollTo(0, 0);
+
                     addView.classList.add('hide');
                     mainView.classList.remove('hide');
                 }]
@@ -715,53 +925,23 @@
                 elementClass: 'add-button',
                 text: 'Discard',
                 eventListener: ['click', () => {
+                    window.scrollTo(0, 0);
+
                     addView.classList.add('hide');
                     mainView.classList.remove('hide');
                 }]
             });
 
+
+            window.scrollTo(0, 0);
+
             addView.classList.remove('hide');
             mainView.classList.add('hide');
         }, false);
 
-        // addSaveButton.addEventListener('click', () => {
-        //     const value = parseFloat(addViewBalance.value);
-
-        //     if (!isNaN(value)) {
-        //         const data = {
-        //             value: value,
-        //             wallet: addViewWallet.value,
-        //             type: 'Payment',
-        //             reimbursable: false,
-        //             reimbursed: false,
-        //             date: addDateInput.value,
-        //             from: '',
-        //             to: '',
-        //             travelType: '',
-        //             comment: addCommentInput.value
-        //         };
-
-        //         ledger.addTransaction(data);
-        //         ledger.saveStorage();
-        //         ledger.refresh();
-        //     }
-
-        //     addView.classList.add('hide');
-        //     mainView.classList.remove('hide');
-
-        //     mainView.scrollTo(0, 0);
-        // }, false);
-
-        // addDiscardButton.addEventListener('click', () => {
-        //     addView.classList.add('hide');
-        //     mainView.classList.remove('hide');
-
-        //     mainView.scrollTo(0, 0);
-        // }, false);
-
         function confirmPrompt(header, yesLabel, noLabel) {
             confirmationView.classList.remove('hide');
-            returnView.classList.add('hide');
+            detailsView.classList.add('hide');
 
             while (confirmationView.firstChild) {
                 confirmationView.firstChild.remove();
@@ -773,10 +953,8 @@
                     ID: 'confirmation-back-arrow',
                     text: '&#8592;',
                     eventListener: ['click', () => {
-                        returnView.classList.remove('hide');
+                        detailsView.classList.remove('hide');
                         confirmationView.classList.add('hide');
-
-                        returnView = mainView;
 
                         resolve();
                     }]
@@ -799,10 +977,8 @@
                     elementClass: 'save-button',
                     text: yesLabel,
                     eventListener: ['click', () => {
-                        returnView.classList.remove('hide');
+                        detailsView.classList.remove('hide');
                         confirmationView.classList.add('hide');
-
-                        returnView = mainView;
 
                         resolve(true);
                     }]
@@ -814,10 +990,8 @@
                     elementClass: 'discard-button',
                     text: noLabel,
                     eventListener: ['click', () => {
-                        returnView.classList.remove('hide');
+                        detailsView.classList.remove('hide');
                         confirmationView.classList.add('hide');
-
-                        returnView = mainView;
 
                         resolve(false);
                     }]
