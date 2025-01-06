@@ -333,6 +333,31 @@
             padding-bottom: 10em;
         }
 
+        .select-wrapper {
+            width: 80%;
+            background: black;
+            max-height: 8em;
+            position: absolute;
+            font-size: 1.4em;
+            color: #fff;
+            font-family: 'Open Sans', 'Helvetica', sans-serif;
+            overflow-y: scroll;
+        }
+
+        .select-item {
+            height: 3em;
+            width: 100%;
+            border-bottom: solid .2em #fff;
+            display: flex;
+            align-items: center;
+            padding-left: 1em;
+            box-sizing: border-box;
+        }
+
+        .select-item:last-child {
+            border-bottom: none;
+        }
+
         input, textarea, button, select {
             -webkit-tap-highlight-color: transparent;
             outline: none;
@@ -671,6 +696,7 @@
                     },
                     eventListener: ['change', () => {
                         this.author = authorInput.value;
+                        this.library.renderList();
                         this.library.saveStorage();
                     }]
                 });
@@ -690,6 +716,7 @@
                     },
                     eventListener: ['change', () => {
                         this.reference = referenceInput.value;
+                        this.library.renderList();
                         this.library.saveStorage();
                     }]
                 });
@@ -709,6 +736,7 @@
                     text: this.text,
                     eventListener: ['change', () => {
                         this.text = quoteInput.value;
+                        this.library.renderList();
                         this.library.saveStorage();
                     }]
                 });
@@ -728,6 +756,7 @@
                     },
                     eventListener: ['change', () => {
                         this.link = linkInput.value;
+                        this.library.renderList();
                         this.library.saveStorage();
                     }]
                 });
@@ -747,6 +776,7 @@
                     },
                     eventListener: ['change', () => {
                         this.category = categoryInput.value || 'misc';
+                        this.library.renderList();
                         this.library.saveStorage();
                     }]
                 });
@@ -766,6 +796,7 @@
                     },
                     eventListener: ['change', () => {
                         this.subcategory = subcategoryInput.value || 'misc';
+                        this.library.renderList();
                         this.library.saveStorage();
                     }]
                 });
@@ -871,8 +902,42 @@
                 elementClass: 'add-input',
                 attributes: {
                     type: 'text'
-                }
+                },
+                eventListener: [['focus', 'keyup'], () => {
+                    while (categorySelect.firstChild) {
+                        categorySelect.firstChild.remove();
+                    }
+
+                    let categories = Object.keys(library.quotes).filter(category => {
+                        return category.toLowerCase().startsWith(categoryInput.value.toLowerCase());
+                    });
+
+                    categories.forEach(category => {
+                        createElement('DIV', {
+                            parent: categorySelect,
+                            elementClass: 'select-item',
+                            text: category,
+                            eventListener: ['click', () => {
+                                categoryInput.value = category;
+                            }]
+                        });
+                    });
+
+                    categorySelect.classList.remove('hide');
+                    categorySelect.style.top = categoryInput.offsetTop + 70 + 'px';
+                }]
             });
+
+            const categorySelect = createElement('DIV', {
+                parent: addView,
+                elementClass: ['hide', 'select-wrapper']
+            });
+
+            categoryInput.addEventListener('focusout', () => {
+                setTimeout(() => {
+                    categorySelect.classList.add('hide');
+                }, 1);
+            }, false);
 
             createElement('H1', {
                 parent: addView,
@@ -885,8 +950,48 @@
                 elementClass: 'add-input',
                 attributes: {
                     type: 'text'
-                }
+                },
+                eventListener: [['focus', 'keyup'], () => {
+                    while (subcategorySelect.firstChild) {
+                        subcategorySelect.firstChild.remove();
+                    }
+
+                    let subcategories = [];
+
+                    if (categoryInput.value in library.quotes) {
+                        Object.keys(library.quotes[categoryInput.value]).forEach(subcategory => {
+                            if (subcategory.toLowerCase().startsWith(subcategoryInput.value.toLowerCase())) {
+                                subcategories.push(subcategory);
+                            }
+                        });
+                    }
+
+                    subcategories.forEach(subcategory => {
+                        createElement('DIV', {
+                            parent: subcategorySelect,
+                            elementClass: 'select-item',
+                            text: subcategory,
+                            eventListener: ['click', () => {
+                                subcategoryInput.value = subcategory;
+                            }]
+                        });
+                    });
+
+                    subcategorySelect.classList.remove('hide');
+                    subcategorySelect.style.top = subcategoryInput.offsetTop - 12 - subcategorySelect.offsetHeight + 'px';
+                }]
             });
+
+            const subcategorySelect = createElement('DIV', {
+                parent: addView,
+                elementClass: ['hide', 'select-wrapper']
+            });
+
+            subcategoryInput.addEventListener('focusout', () => {
+                setTimeout(() => {
+                    subcategorySelect.classList.add('hide');
+                }, 1);
+            }, false);
 
             const buttonWrapper = createElement('DIV', {
                 parent: addView,
