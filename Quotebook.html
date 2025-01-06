@@ -24,6 +24,7 @@
             align-items: center;
             flex-direction: column;
             padding-top: 7.5em;
+            padding-bottom: 5.5em;
         }
 
         #search-header {
@@ -52,7 +53,7 @@
 
         #quote-button svg {
             position: relative;
-            top: -1.4em;
+            top: -0.7em;
         }
 
         #settings-button {
@@ -85,6 +86,8 @@
             font-weight: 400;
             color: #000;
             margin-bottom: .5em;
+            border-top: solid .07em #b5b5b5;
+            padding-top: 0.5em;
         }
 
         .quotes-subcategory {
@@ -96,7 +99,7 @@
 
         .quote {
             font-size: 1.2em;
-            margin-top: 2em;
+            margin-top: 1.4em;
         }
 
         .quote-text {
@@ -126,6 +129,62 @@
 
         .hide {
             display: none !important;
+        }
+
+        .add-input {
+            box-sizing: border-box;
+            width: 80%;
+            height: 2.6em;
+            background: transparent;
+            border: solid .1em #000;
+            font-size: 1.4em;
+            color: #000;
+            font-family: 'Open Sans', 'Helvetica', sans-serif;
+            padding: 0em 1em;
+        }
+
+        .add-textarea {
+            box-sizing: border-box;
+            width: 80%;
+            background: transparent;
+            border: solid .1em #000;
+            font-size: 1.4em;
+            color: #000;
+            font-family: 'Open Sans', 'Helvetica', sans-serif;
+            padding: 1em 1em;
+            line-height: 1.5em;
+        }
+
+        .add-input-label {
+            font-size: 2.4em;
+            font-weight: 400;
+            color: #000;
+            margin-top: 1em;
+            margin-bottom: .5em;
+            text-align: left;
+            width: 80%;
+        }
+
+        .add-button-wrapper {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 6em;
+            background: #fff;
+            border-top: solid 0.2em #000;
+        }
+
+        .add-button {
+            background: #000;
+            color: #fff;
+            font-size: 1.4em;
+            border: none;
+            height: 2.5em;
+            width: 7em;
+            margin: 0.9em;
         }
 
         #details-back-arrow {
@@ -194,69 +253,11 @@
             color: #737373;
         }
 
-        .save-discard-buttons button {
-            font-size: 1.3em;
-            width: 6em;
-            height: 2.3em;
-            margin: .7em;
-            border-radius: .3em;
-            font-weight: 400;
-        }
-
-        .save-button {
-            border: solid .15em #737373;
-            background: white;
-            color: #636363;
-        }
-
-        .discard-button {
-            border: solid .15em #ff5757;
-            background: #ff5757;
-            color: white;
-        }
-
-        .text-input {
-            width: 8em;
-            height: 1em;
-            font-size: .9em;
-            padding: .7em 1em;
-            border: solid .1em rgb(134, 134, 134);
-            color: #5b5b5b;
-            outline: none;
-        }
-
         #add-view {
             display: flex;
             flex-direction: column;
             align-items: center;
-        }
-
-        #add-save {
-            background: #00a8a8;
-            border-color: #00a8a8;
-            color: white;
-            left: 1em;
-
-        }
-
-        #add-discard {
-            right: 1em;
-        }
-
-        #add-buttons {
-            position: fixed;
-            bottom: 0;
-            height: 6em;
-            width: 100%;
-            background: white;
-            border-top: solid .23em #d3d3d3;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        #add-buttons button {
-            margin: 2em;
+            padding-bottom: 10em;
         }
 
         input, textarea, button, select {
@@ -396,23 +397,15 @@
                     this.quotes[category] = {};
                 }
 
-                if (subcategory) {
-                    if (!(subcategory in this.quotes[category])) {
-                        this.quotes[category][subcategory] = [];
-                    }
-
-                    this.quotes[category][subcategory].push(quote);
-                } else {
-                    if (!('misc' in this.quotes[category])) {
-                        this.quotes[category]['misc'] = [];
-                    }
-
-                    this.quotes[category]['misc'].push(quote);
+                if (!(subcategory in this.quotes[category])) {
+                    this.quotes[category][subcategory] = [];
                 }
+
+                this.quotes[category][subcategory].push(quote);
             }
 
             removeQuote(quote) {
-                delete this.quotes[quote.category][quote.subcategory ? quote.subcategory : 'misc'];
+                delete this.quotes[quote.category][quote.subcategory];
 
                 this.saveStorage();
             }
@@ -432,25 +425,6 @@
                 } else {
                     data = [];
                 }
-
-                data = [
-                    {
-                        author: '',
-                        reference: 'Moses 6:31-34',
-                        text: 'Why Chose me? Thou shalt abide in me and I in thee therefore walk with me.',
-                        link: 'churchofjesuschrist.org',
-                        category: 'Follow Him',
-                        subcategory: 'The Invitation'
-                    },
-                    {
-                        author: 'Holland',
-                        reference: 'Borne upon Eagles\' Wings',
-                        text: '"It\'s one thing to reap in kind, but we reap, somehow, always in greater quantity. We sow a little thistle, and we get a lot of thistle—years and years of it, big bushes and branches of it."',
-                        link: '',
-                        category: 'Follow Him',
-                        subcategory: 'The Invitation'
-                    },
-                ];
 
                 this.loadList(data);
             }
@@ -478,15 +452,17 @@
                     createElement('H1', {
                         parent: quotesList,
                         elementClass: 'quotes-category',
-                        text: category
+                        text: category === 'misc' ? 'Miscellaneous' : category
                     });
 
                     Object.keys(this.quotes[category]).forEach(subcategory => {
-                        createElement('H2', {
-                            parent: quotesList,
-                            elementClass: 'quotes-subcategory',
-                            text: subcategory
-                        });
+                        if (subcategory !== 'misc') {
+                            createElement('H2', {
+                                parent: quotesList,
+                                elementClass: 'quotes-subcategory',
+                                text: subcategory
+                            });
+                        }
 
                         Object.values(this.quotes[category][subcategory]).forEach(quote => {
                             quote.renderRow();
@@ -510,12 +486,12 @@
 
             getRaw() {
                 return {
-                    author: author,
-                    reference: reference,
-                    text: text,
-                    link: link,
-                    category: category,
-                    subcategory: subcategory
+                    author: this.author,
+                    reference: this.reference,
+                    text: this.text,
+                    link: this.link,
+                    category: this.category,
+                    subcategory: this.subcategory
                 };
             }
 
@@ -578,6 +554,13 @@
                 currentTransaction = this;
                 returnView = detailsView;
 
+                    // author: author,
+                    // reference: reference,
+                    // text: text,
+                    // link: link,
+                    // category: category,
+                    // subcategory: subcategory
+
                 while (detailsView.firstChild) {
                     detailsView.firstChild.remove();
                 }
@@ -598,281 +581,7 @@
                     }]
                 });
 
-                const balanceHeader = createElement('H1', {
-                    parent: detailsView,
-                    elementClass: this.value >= 0 ? 'positive' : 'negative',
-                    ID: 'details-balance',
-                    text: formatNumber(this.value),
-                    eventListener: ['click', () => {
-                        if (balanceHeader.getAttribute('editing') !== 'yes') {
-                            this.createEdit(balanceHeader, 'number', 'value');
-                        }
-                    }]
-                });
-
-                const wallet = createElement('H2', {
-                    parent: detailsView,
-                    ID: 'details-wallet',
-                    text: this.wallet,
-                    eventListener: ['click', () => {
-                        if (wallet.getAttribute('editing') !== 'yes') {
-                            this.createEdit(wallet, [
-                                'MSF',
-                                'Personal',
-                                'ICOCA'
-                            ], 'wallet');
-                        }
-                    }]
-                });
-
-                const detailsTable = createElement('TABLE', {
-                    ID: 'details-table',
-                    parent: detailsView
-                });
-
-                const typeRow = createElement('TR', {
-                    parent: detailsTable
-                });
-
-                createElement('TD', {
-                    parent: typeRow,
-                    elementClass: 'details-table-header',
-                    text: 'Type'
-                });
-
-                const typeColumn = createElement('TD', {
-                    parent: typeRow,
-                    elementClass: 'details-table-item',
-                    text: this.type,
-                    eventListener: ['click', () => {
-                        if (typeColumn.getAttribute('editing') !== 'yes') {
-                            this.createEdit(typeColumn, [
-                                'Food',
-                                'House',
-                                'Hygiene',
-                                'Travel',
-                                'ICOCA',
-                                'Payment',
-                                'Misc'
-                            ], 'type', type => {
-                                if (type !== 'Travel') {
-                                    fromRow.classList.add('hide');
-                                    toRow.classList.add('hide');
-                                    travelTypeRow.classList.add('hide');
-                                } else {
-                                    fromRow.classList.remove('hide');
-                                    toRow.classList.remove('hide');
-                                    travelTypeRow.classList.remove('hide');
-                                }
-                            });
-                        }
-                    }]
-                });
-
-                const reimbursableRow = createElement('TR', {
-                    parent: detailsTable
-                });
-
-                createElement('TD', {
-                    parent: reimbursableRow,
-                    elementClass: 'details-table-header',
-                    text: 'Reimbursable'
-                });
-                const reimbursableColumn = createElement('TD', {
-                    parent: reimbursableRow,
-                    elementClass: 'details-table-item'
-                });
-                createElement('INPUT', {
-                    parent: createElement('DIV', {
-                        elementClass: 'checkmark-indicator',
-                        parent: reimbursableColumn
-                    }),
-                    elementClass: 'checkmark-input',
-                    eventListener: ['change', e => {
-                        if (e.currentTarget.checked) {
-                            reimbursedRow.classList.remove('hide');
-                        } else {
-                            reimbursedRow.classList.add('hide');
-                        }
-
-                        this.setProperty('reimbursable', e.currentTarget.checked);
-                    }],
-                    attributes: {
-                        type: 'checkbox',
-                        checked: this.reimbursable
-                    }
-                });
-
-                const reimbursedRow = createElement('TR', {
-                    parent: detailsTable,
-                    elementClass: this.reimbursable ? '' : 'hide'
-                });
-
-                createElement('TD', {
-                    parent: reimbursedRow,
-                    elementClass: 'details-table-header',
-                    text: 'Returned'
-                });
-                const reimbursedColumn = createElement('TD', {
-                    parent: reimbursedRow,
-                    elementClass: 'details-table-item'
-                });
-
-                createElement('INPUT', {
-                    parent: createElement('DIV', {
-                        elementClass: 'checkmark-indicator',
-                        parent: reimbursedColumn
-                    }),
-                    elementClass: 'checkmark-input',
-                    attributes: {
-                        type: 'checkbox',
-                        checked: this.reimbursed
-                    },
-                    eventListener: ['change', e => {
-                        this.setProperty('reimbursed', e.currentTarget.checked);
-                    }]
-                });
-
-                const dateRow = createElement('TR', {
-                    parent: detailsTable
-                });
-
-                createElement('TD', {
-                    parent: dateRow,
-                    elementClass: 'details-table-header',
-                    text: 'Date'
-                });
-                const dateColumn = createElement('TD', {
-                    parent: dateRow,
-                    elementClass: 'details-table-item',
-                    text: formatDate(this.date),
-                    eventListener: ['click', () => {
-                        if (dateColumn.getAttribute('editing') !== 'yes') {
-                            this.createEdit(dateColumn, 'date', 'date');
-                        }
-                    }]
-                });
-
-                const fromRow = createElement('TR', {
-                    parent: detailsTable,
-                    elementClass: this.type === 'Travel' ? '' : 'hide'
-                });
-
-                createElement('TD', {
-                    parent: fromRow,
-                    elementClass: 'details-table-header',
-                    text: 'From'
-                });
-                const fromColumn = createElement('TD', {
-                    parent: fromRow,
-                    elementClass: 'details-table-item',
-                    text: this.from,
-                    eventListener: ['click', () => {
-                        if (fromColumn.getAttribute('editing') !== 'yes') {
-                            this.createEdit(fromColumn, 'text', 'from');
-                        }
-                    }]
-                });
-
-                const toRow = createElement('TR', {
-                    parent: detailsTable,
-                    elementClass: this.type === 'Travel' ? '' : 'hide'
-                });
-
-                createElement('TD', {
-                    parent: toRow,
-                    elementClass: 'details-table-header',
-                    text: 'To'
-                });
-                const toColumn = createElement('TD', {
-                    parent: toRow,
-                    elementClass: 'details-table-item',
-                    text: this.to,
-                    eventListener: ['click', () => {
-                        if (toColumn.getAttribute('editing') !== 'yes') {
-                            this.createEdit(toColumn, 'text', 'to');
-                        }
-                    }]
-                });
-
-                const travelTypeRow = createElement('TR', {
-                    parent: detailsTable,
-                    elementClass: this.type === 'Travel' ? '' : 'hide'
-                });
-
-                createElement('TD', {
-                    parent: travelTypeRow,
-                    elementClass: 'details-table-header',
-                    text: 'Travel Type'
-                });
-                const travelTypeColumn = createElement('TD', {
-                    parent: travelTypeRow,
-                    elementClass: 'details-table-item',
-                    text: this.travelType,
-                    eventListener: ['click', () => {
-                        if (typeColumn.getAttribute('editing') !== 'yes') {
-                            this.createEdit(travelTypeColumn, [
-                                'Koukan',
-                                'District Meeting',
-                                'Zone Conference',
-                                'Interviews',
-                                'Satellite Area',
-                                'Transfers',
-                                'MLC',
-                                'TTTM',
-                                'Health',
-                                'Baptismal Interview',
-                                'District Conference',
-                                'Stake Conference',
-                                'Branch Conference',
-                                'Mission Conference',
-                                'Other Travel'
-                            ], 'travelType');
-                        }
-                    }]
-                });
-
-                createElement('H2', {
-                    parent: detailsView,
-                    ID: 'details-comment-header',
-                    text: 'Comment'
-                });
-
-                const comment = createElement('DIV', {
-                    parent: detailsView,
-                    ID: 'details-comment',
-                    text: this.comment,
-                    eventListener: ['click', () => {
-                        if (comment.getAttribute('editing') !== 'yes') {
-                            this.createEdit(comment, 'textarea', 'comment');
-                        }
-                    }]
-                });
-
-                createElement('BUTTON', {
-                    parent: createElement('DIV', {
-                        parent: detailsView,
-                        ID: 'details-delete-wrapper'
-                    }),
-                    ID: 'details-delete',
-                    text: 'DELETE',
-                    eventListener: ['click', () => {
-                        confirmPrompt('Are you sure?', 'Yes', 'No').then(response => {
-                            if (response) {
-                                this.ledger.removeTransaction(this);
-                                this.ledger.refresh();
-
-                                detailsView.classList.add('hide');
-                                mainView.classList.remove('hide');
-
-                                mainView.scrollTo(0, 0);
-                            }
-                        });
-                    }]
-                });
-
                 mainView.classList.add('hide');
-                receiptView.classList.add('hide');
                 detailsView.classList.remove('hide');
             }
         }
@@ -883,6 +592,134 @@
         library.renderList();
 
         quoteButton.addEventListener('click', () => {
+            while (addView.firstChild) {
+                addView.firstChild.remove();
+            }
+
+            createElement('H1', {
+                parent: addView,
+                text: 'Author',
+                elementClass: 'add-input-label'
+            });
+
+            const authorInput = createElement('INPUT', {
+                parent: addView,
+                elementClass: 'add-input',
+                attributes: {
+                    type: 'text'
+                }
+            });
+
+            createElement('H1', {
+                parent: addView,
+                text: 'Reference',
+                elementClass: 'add-input-label'
+            });
+
+            const referenceInput = createElement('INPUT', {
+                parent: addView,
+                elementClass: 'add-input',
+                attributes: {
+                    type: 'text'
+                }
+            });
+
+            createElement('H1', {
+                parent: addView,
+                text: 'Quote',
+                elementClass: 'add-input-label'
+            });
+
+            const quoteInput = createElement('TEXTAREA', {
+                parent: addView,
+                elementClass: 'add-textarea',
+                attributes: {
+                    rows: 4
+                }
+            });
+
+            createElement('H1', {
+                parent: addView,
+                text: 'Link',
+                elementClass: 'add-input-label'
+            });
+
+            const linkInput = createElement('INPUT', {
+                parent: addView,
+                elementClass: 'add-input',
+                attributes: {
+                    type: 'text'
+                }
+            });
+
+            createElement('H1', {
+                parent: addView,
+                text: 'Category',
+                elementClass: 'add-input-label'
+            });
+
+            const categoryInput = createElement('INPUT', {
+                parent: addView,
+                elementClass: 'add-input',
+                attributes: {
+                    type: 'text'
+                }
+            });
+
+            createElement('H1', {
+                parent: addView,
+                text: 'Subcategory',
+                elementClass: 'add-input-label'
+            });
+
+            const subcategoryInput = createElement('INPUT', {
+                parent: addView,
+                elementClass: 'add-input',
+                attributes: {
+                    type: 'text'
+                }
+            });
+
+            const buttonWrapper = createElement('DIV', {
+                parent: addView,
+                elementClass: 'add-button-wrapper'
+            });
+
+            createElement('BUTTON', {
+                parent: buttonWrapper,
+                elementClass: 'add-button',
+                text: 'Save',
+                eventListener: ['click', () => {
+                    if (authorInput.value || referenceInput.value) {
+                        const quote = new Quote(
+                            authorInput.value,
+                            referenceInput.value,
+                            quoteInput.value,
+                            linkInput.value,
+                            categoryInput.value || 'misc',
+                            subcategoryInput.value || 'misc'
+                        );
+
+                        library.addQuote(quote);
+                        library.saveStorage();
+                        library.renderList();
+                    }
+
+                    addView.classList.add('hide');
+                    mainView.classList.remove('hide');
+                }]
+            });
+
+            createElement('BUTTON', {
+                parent: buttonWrapper,
+                elementClass: 'add-button',
+                text: 'Discard',
+                eventListener: ['click', () => {
+                    addView.classList.add('hide');
+                    mainView.classList.remove('hide');
+                }]
+            });
+
             addView.classList.remove('hide');
             mainView.classList.add('hide');
         }, false);
