@@ -358,6 +358,76 @@
             border-bottom: none;
         }
 
+        #settings-view {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 3em;
+            padding-bottom: 3em;
+        }
+
+        .settings-title {
+            font-size: 2.4em;
+            font-weight: 400;
+            color: #000;
+            margin-bottom: .5em;
+            padding-top: 0.5em;
+            width: 80%;
+        }
+
+        .settings-header {
+            font-size: 1.4em;
+            font-weight: 600;
+            color: #545454;
+            font-family: 'Open Sans', 'Helvetica', sans-serif;
+            width: 80%;
+        }
+
+        .settings-button {
+            width: 80%;
+            height: 3.1em;
+            border: none;
+            outline: none;
+            font-size: 1.2em;
+            background: #000;
+            color: white;
+        }
+
+        .language-input {
+            display: flex;
+            align-items: center;
+            box-sizing: border-box;
+            width: 80%;
+            height: 2.6em;
+            background: transparent;
+            border: solid .1em #000;
+            font-size: 1.4em;
+            color: #000;
+            font-family: 'Open Sans', 'Helvetica', sans-serif;
+            padding: 0em 1em;
+        }
+
+        .language-select-wrapper {
+            width: 80%;
+            background: #ffffff;
+            max-height: 8em;
+            position: absolute;
+            font-size: 1.4em;
+            color: #000000;
+            font-family: 'Open Sans', 'Helvetica', sans-serif;
+            overflow-y: scroll;
+            border: solid .12em #000;
+        }
+
+        .language-select-item {
+            height: 3em;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            padding-left: 1em;
+            box-sizing: border-box;
+        }
+
         input, textarea, button, select {
             -webkit-tap-highlight-color: transparent;
             outline: none;
@@ -1068,6 +1138,112 @@
             library.loadStorage(searchInput.value);
             library.renderList();
         }, false);
+
+        settingsButton.addEventListener('click', () => {
+            window.scrollTo(0, 0);
+
+            while (settingsView.firstChild) {
+                settingsView.firstChild.remove();
+            }
+
+            createElement('DIV', {
+                parent: settingsView,
+                ID: 'details-back-arrow',
+                text: '&#8592;',
+                eventListener: ['click', () => {
+                    library.renderList();
+
+                    window.scrollTo(0, 0);
+
+                    settingsView.classList.add('hide');
+                    mainView.classList.remove('hide');
+                }]
+            });
+
+            createElement('H1', {
+                parent: settingsView,
+                text: 'Settings',
+                elementClass: 'settings-title'
+            });
+
+            createElement('H2', {
+                parent: settingsView,
+                text: 'Default Language',
+                elementClass: 'settings-header'
+            });
+
+            const languageInput = createElement('DIV', {
+                parent: settingsView,
+                elementClass: 'language-input',
+                text: window.localStorage.getItem('settings-language') || 'English',
+                eventListener: ['click', e => {
+                    e.stopPropagation();
+
+                    while (languageSelect.firstChild) {
+                        languageSelect.firstChild.remove();
+                    }
+
+                    const languages = ['English', 'Portuguese', 'Spanish', 'Japanese'];
+
+                    languages.forEach(language => {
+                        createElement('DIV', {
+                            parent: languageSelect,
+                            elementClass: 'language-select-item',
+                            text: language,
+                            eventListener: ['click', () => {
+                                languageInput.innerText = language;
+                                window.localStorage.setItem('settings-language', language);
+                            }]
+                        });
+                    });
+
+                    languageSelect.classList.remove('hide');
+                    languageSelect.style.top = languageInput.offsetTop + 70 + 'px';
+                }]
+            });
+
+            window.addEventListener('click', e => {
+                languageSelect.classList.add('hide');
+            }, false);
+
+            const languageSelect = createElement('DIV', {
+                parent: settingsView,
+                elementClass: ['hide', 'language-select-wrapper']
+            });
+
+            languageInput.addEventListener('focusout', () => {
+                setTimeout(() => {
+                    languageSelect.classList.add('hide');
+                }, 1);
+            }, false);
+
+            createElement('H2', {
+                parent: settingsView,
+                text: 'Import',
+                elementClass: 'settings-header'
+            });
+
+            createElement('BUTTON', {
+                parent: settingsView,
+                text: 'Open File',
+                elementClass: 'settings-button'
+            });
+
+            createElement('H2', {
+                parent: settingsView,
+                text: 'Export',
+                elementClass: 'settings-header'
+            });
+
+            createElement('BUTTON', {
+                parent: settingsView,
+                text: 'Save',
+                elementClass: 'settings-button'
+            });
+
+            mainView.classList.add('hide');
+            settingsView.classList.remove('hide');
+        });
 
         function confirmPrompt(header, yesLabel, noLabel) {
             confirmationView.classList.remove('hide');
