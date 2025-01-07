@@ -787,15 +787,15 @@
                     quotesList.firstChild.remove();
                 }
 
-                Object.keys(this.quotes).forEach(category => {
+                Object.keys(this.quotes).sort().forEach(category => {
                     createElement('H1', {
                         parent: quotesList,
                         elementClass: 'quotes-category',
-                        text: category === 'misc' ? 'Miscellaneous' : category
+                        text: category === 'zzzmisc' ? 'Miscellaneous' : category
                     });
 
-                    Object.keys(this.quotes[category]).forEach(subcategory => {
-                        if (subcategory !== 'misc') {
+                    Object.keys(this.quotes[category]).sort().forEach(subcategory => {
+                        if (subcategory !== '0misc') {
                             createElement('H2', {
                                 parent: quotesList,
                                 elementClass: 'quotes-subcategory',
@@ -1010,7 +1010,7 @@
                     elementClass: 'details-input',
                     attributes: {
                         type: 'text',
-                        value: this.category === 'misc' ? '' : this.category
+                        value: this.category === 'zzzmisc' ? '' : this.category
                     },
                     eventListener: [['focus', 'keyup'], () => {
                         while (categorySelect.firstChild) {
@@ -1022,7 +1022,7 @@
                         });
 
                         categories.forEach(category => {
-                            if (category === 'misc') return;
+                            if (category === 'zzzmisc') return;
 
                             createElement('DIV', {
                                 parent: categorySelect,
@@ -1046,7 +1046,7 @@
 
                 categoryInput.addEventListener('focusout', () => {
                     setTimeout(() => {
-                        this.category = categoryInput.value || 'misc';
+                        this.category = categoryInput.value || 'zzzmisc';
                         this.library.saveStorage();
                         this.library.loadStorage();
                         this.library.renderList();
@@ -1066,7 +1066,7 @@
                     elementClass: 'details-input',
                     attributes: {
                         type: 'text',
-                        value: this.subcategory === 'misc' ? '' : this.subcategory
+                        value: this.subcategory === '0misc' ? '' : this.subcategory
                     },
                     eventListener: [['focus', 'keyup'], () => {
                         while (subcategorySelect.firstChild) {
@@ -1084,7 +1084,7 @@
                         }
 
                         subcategories.forEach(subcategory => {
-                            if (subcategory === 'misc') return;
+                            if (subcategory === '0misc') return;
 
                             createElement('DIV', {
                                 parent: subcategorySelect,
@@ -1093,7 +1093,7 @@
                                 eventListener: ['click', () => {
                                     subcategoryInput.value = subcategory;
 
-                                    this.subcategory = subcategoryInput.value || 'misc';
+                                    this.subcategory = subcategoryInput.value || '0misc';
                                     this.library.saveStorage();
                                     this.library.loadStorage();
                                     this.library.renderList();
@@ -1113,7 +1113,7 @@
 
                 subcategoryInput.addEventListener('focusout', () => {
                     setTimeout(() => {
-                        this.subcategory = subcategoryInput.value || 'misc';
+                        this.subcategory = subcategoryInput.value || '0misc';
                         this.library.saveStorage();
                         this.library.loadStorage();
                         this.library.renderList();
@@ -1241,7 +1241,7 @@
                     });
 
                     categories.forEach(category => {
-                        if (category === 'misc') return;
+                        if (category === 'zzzmisc') return;
 
                         createElement('DIV', {
                             parent: categorySelect,
@@ -1297,7 +1297,7 @@
                     }
 
                     subcategories.forEach(subcategory => {
-                        if (subcategory === 'misc') return;
+                        if (subcategory === '0misc') return;
 
                         createElement('DIV', {
                             parent: subcategorySelect,
@@ -1341,8 +1341,8 @@
                             referenceInput.value,
                             quoteInput.value,
                             linkInput.value,
-                            categoryInput.value || 'misc',
-                            subcategoryInput.value || 'misc'
+                            categoryInput.value || 'zzzmisc',
+                            subcategoryInput.value || '0misc'
                         );
 
                         library.addQuote(quote);
