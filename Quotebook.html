@@ -882,7 +882,7 @@
                     createElement('SPAN', {
                         parent: reference,
                         elementClass: 'reference-author',
-                        text: this.author + ', '
+                        text: this.author + (this.reference ? ', ' : '')
                     });
                 }
 
