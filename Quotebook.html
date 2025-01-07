@@ -893,6 +893,9 @@
             renderDetails() {
                 window.scrollTo(0, 0);
 
+                searchInput.value = '';
+                this.library.loadStorage();
+
                 while (detailsView.firstChild) {
                     detailsView.firstChild.remove();
                 }
@@ -1019,7 +1022,7 @@
 
                         let categories = Object.keys(this.library.quotes).filter(category => {
                             return category.toLowerCase().startsWith(categoryInput.value.toLowerCase());
-                        });
+                        }).sort();
 
                         categories.forEach(category => {
                             if (category === 'zzzmisc') return;
@@ -1083,7 +1086,7 @@
                             });
                         }
 
-                        subcategories.forEach(subcategory => {
+                        subcategories.sort().forEach(subcategory => {
                             if (subcategory === '0misc') return;
 
                             createElement('DIV', {
@@ -1152,6 +1155,9 @@
         library.renderList();
 
         quoteButton.addEventListener('click', () => {
+            searchInput.value = '';
+            library.loadStorage();
+
             while (addView.firstChild) {
                 addView.firstChild.remove();
             }
@@ -1238,7 +1244,7 @@
 
                     let categories = Object.keys(library.quotes).filter(category => {
                         return category.toLowerCase().startsWith(categoryInput.value.toLowerCase());
-                    });
+                    }).sort();
 
                     categories.forEach(category => {
                         if (category === 'zzzmisc') return;
@@ -1296,7 +1302,7 @@
                         });
                     }
 
-                    subcategories.forEach(subcategory => {
+                    subcategories.sort().forEach(subcategory => {
                         if (subcategory === '0misc') return;
 
                         createElement('DIV', {
@@ -1366,6 +1372,8 @@
 
                     addView.classList.add('hide');
                     mainView.classList.remove('hide');
+
+                    library.renderList();
                 }]
             });
 
@@ -1382,6 +1390,9 @@
         }, false);
 
         settingsButton.addEventListener('click', () => {
+            searchInput.value = '';
+            library.loadStorage();
+
             window.scrollTo(0, 0);
 
             while (settingsView.firstChild) {
