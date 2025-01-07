@@ -645,7 +645,7 @@
         }
 
         function linkScripture(reference) {
-            const scripturePattern = /^(?<book>(?:\d )?(?:[A-Za-z ]+)+) (?<chapter>\d)(?::(?<start>\d)(?:-(?<end>\d))?)?$/i;
+            const scripturePattern = /^(?<book>(?:\d )?(?:[A-Za-z ]+)+) (?<chapter>\d+)(?::(?<start>\d+)(?:-(?<end>\d+))?)?$/i;
             let link = '';
 
             if (scripturePattern.test(reference)) {
