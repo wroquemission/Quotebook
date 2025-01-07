@@ -303,6 +303,7 @@
             font-size: 2.2em;
             font-weight: 400;
             color: #737373;
+            text-align: center;
         }
 
         .save-discard-buttons button {
@@ -761,7 +762,7 @@
                 this.loadList(data, query);
             }
 
-            saveStorage() {
+            getRaw() {
                 let data = [];
 
                 Object.values(this.quotes).forEach(category => {
@@ -771,6 +772,12 @@
                         });
                     });
                 });
+
+                return data;
+            }
+
+            saveStorage() {
+                const data = this.getRaw();
 
                 window.localStorage.setItem('quotebook-library', JSON.stringify(data));
             }
@@ -1039,7 +1046,7 @@
                     elementClass: 'details-delete',
                     text: 'Delete',
                     eventListener: ['click', () => {
-                        confirmPrompt('Are you sure?', 'Yes', 'No').then(response => {
+                        confirmPrompt('Are you sure?', 'Yes', 'No', detailsView).then(response => {
                             if (response) {
                                 this.library.removeQuote(this);
                                 this.library.renderList();
@@ -1376,7 +1383,45 @@
             createElement('BUTTON', {
                 parent: settingsView,
                 text: 'Open File',
-                elementClass: 'settings-button'
+                elementClass: 'settings-button',
+                eventListener: ['click', () => {
+                    const fileInput = createElement('INPUT', {
+                        parent: settingsView,
+                        elementClass: 'hide',
+                        attributes: {
+                            type: 'file',
+                            accept: '.quotes'
+                        },
+                        eventListener: ['change', e => {
+                            const file = e.target.files[0];
+
+                            if (!file) return;
+
+                            const reader = new FileReader();
+
+                            reader.onload = e => {
+                                confirmPrompt('This will overwrite your current library.', 'Ok', 'Cancel', settingsView).then(response => {
+                                    if (response) {
+                                        const contents = e.target.result;
+
+                                        library.loadList(JSON.parse(contents));
+                                        library.renderList();
+                                        library.saveStorage();
+
+                                        window.scrollTo(0, 0);
+
+                                        settingsView.classList.add('hide');
+                                        mainView.classList.remove('hide');
+                                    }
+                                });
+                            };
+
+                            reader.readAsText(file);
+                        }]
+                    });
+                    fileInput.click();
+                    fileInput.remove();
+                }]
             });
 
             createElement('H2', {
@@ -1388,16 +1433,31 @@
             createElement('BUTTON', {
                 parent: settingsView,
                 text: 'Save',
-                elementClass: 'settings-button'
+                elementClass: 'settings-button',
+                eventListener: ['click', () => {
+                    const data = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(library.getRaw()));
+                    
+                    const link = createElement('A', {
+                        parent: settingsView,
+                        elementClass: 'hide',
+                        attributes: {
+                            href: data,
+                            download: 'backup.quotes'
+                        }
+                    });
+
+                    link.click();
+                    link.remove();
+                }]
             });
 
             mainView.classList.add('hide');
             settingsView.classList.remove('hide');
         });
 
-        function confirmPrompt(header, yesLabel, noLabel) {
+        function confirmPrompt(header, yesLabel, noLabel, view) {
             confirmationView.classList.remove('hide');
-            detailsView.classList.add('hide');
+            view.classList.add('hide');
 
             while (confirmationView.firstChild) {
                 confirmationView.firstChild.remove();
@@ -1409,7 +1469,7 @@
                     ID: 'confirmation-back-arrow',
                     text: '&#8592;',
                     eventListener: ['click', () => {
-                        detailsView.classList.remove('hide');
+                        view.classList.remove('hide');
                         confirmationView.classList.add('hide');
 
                         resolve();
@@ -1433,7 +1493,7 @@
                     elementClass: 'save-button',
                     text: yesLabel,
                     eventListener: ['click', () => {
-                        detailsView.classList.remove('hide');
+                        view.classList.remove('hide');
                         confirmationView.classList.add('hide');
 
                         resolve(true);
@@ -1446,7 +1506,7 @@
                     elementClass: 'discard-button',
                     text: noLabel,
                     eventListener: ['click', () => {
-                        detailsView.classList.remove('hide');
+                        view.classList.remove('hide');
                         confirmationView.classList.add('hide');
 
                         resolve(false);
