@@ -236,7 +236,7 @@
             margin: 0.9em;
         }
 
-        .details-back-arrow {
+        .back-arrow {
             font-size: 5em;
             color: #cbcbcb;
             width: 1.5em;
@@ -279,14 +279,14 @@
         }
 
         #confirmation-back-arrow {
-            font-size: 3em;
+            font-size: 5em;
             color: #cbcbcb;
             width: 1.5em;
             text-align: center;
             margin: 0;
             position: absolute;
-            left: .5em;
-            top: .2em;
+            left: 0.08em;
+            top: -.1em;
         }
 
         #confirmation-view {
@@ -899,7 +899,7 @@
 
                 createElement('DIV', {
                     parent: detailsView,
-                    elementClass: 'details-back-arrow',
+                    elementClass: 'back-arrow',
                     text: '&#8592;',
                     eventListener: ['click', () => {
                         this.library.renderList();
@@ -1390,7 +1390,7 @@
 
             createElement('DIV', {
                 parent: settingsView,
-                elementClass: 'details-back-arrow',
+                elementClass: 'back-arrow',
                 text: '&#8592;',
                 eventListener: ['click', () => {
                     library.renderList();
