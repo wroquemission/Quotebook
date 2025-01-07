@@ -1012,13 +1012,48 @@
                         type: 'text',
                         value: this.category === 'misc' ? '' : this.category
                     },
-                    eventListener: ['change', () => {
+                    eventListener: [['focus', 'keyup'], () => {
+                        while (categorySelect.firstChild) {
+                            categorySelect.firstChild.remove();
+                        }
+
+                        let categories = Object.keys(this.library.quotes).filter(category => {
+                            return category.toLowerCase().startsWith(categoryInput.value.toLowerCase());
+                        });
+
+                        categories.forEach(category => {
+                            if (category === 'misc') return;
+
+                            createElement('DIV', {
+                                parent: categorySelect,
+                                elementClass: 'select-item',
+                                text: category,
+                                eventListener: ['click', () => {
+                                    categoryInput.value = category;
+                                }]
+                            });
+                        });
+
+                        categorySelect.classList.remove('hide');
+                        categorySelect.style.top = categoryInput.offsetTop + 70 + 'px';
+                    }]
+                });
+
+                const categorySelect = createElement('DIV', {
+                    parent: detailsView,
+                    elementClass: ['hide', 'select-wrapper']
+                });
+
+                categoryInput.addEventListener('focusout', () => {
+                    setTimeout(() => {
                         this.category = categoryInput.value || 'misc';
                         this.library.saveStorage();
                         this.library.loadStorage();
                         this.library.renderList();
-                    }]
-                });
+
+                        categorySelect.classList.add('hide');
+                    }, 1);
+                }, false);
 
                 createElement('H1', {
                     parent: detailsView,
@@ -1033,13 +1068,59 @@
                         type: 'text',
                         value: this.subcategory === 'misc' ? '' : this.subcategory
                     },
-                    eventListener: ['change', () => {
+                    eventListener: [['focus', 'keyup'], () => {
+                        while (subcategorySelect.firstChild) {
+                            subcategorySelect.firstChild.remove();
+                        }
+
+                        let subcategories = [];
+
+                        if (categoryInput.value in library.quotes) {
+                            Object.keys(library.quotes[categoryInput.value]).forEach(subcategory => {
+                                if (subcategory.toLowerCase().startsWith(subcategoryInput.value.toLowerCase())) {
+                                    subcategories.push(subcategory);
+                                }
+                            });
+                        }
+
+                        subcategories.forEach(subcategory => {
+                            if (subcategory === 'misc') return;
+
+                            createElement('DIV', {
+                                parent: subcategorySelect,
+                                elementClass: 'select-item',
+                                text: subcategory,
+                                eventListener: ['click', () => {
+                                    subcategoryInput.value = subcategory;
+
+                                    this.subcategory = subcategoryInput.value || 'misc';
+                                    this.library.saveStorage();
+                                    this.library.loadStorage();
+                                    this.library.renderList();
+                                }]
+                            });
+                        });
+
+                        subcategorySelect.classList.remove('hide');
+                        subcategorySelect.style.top = subcategoryInput.offsetTop - 12 - subcategorySelect.offsetHeight + 'px';
+                    }]
+                });
+
+                const subcategorySelect = createElement('DIV', {
+                    parent: detailsView,
+                    elementClass: ['hide', 'select-wrapper']
+                });
+
+                subcategoryInput.addEventListener('focusout', () => {
+                    setTimeout(() => {
                         this.subcategory = subcategoryInput.value || 'misc';
                         this.library.saveStorage();
                         this.library.loadStorage();
                         this.library.renderList();
-                    }]
-                });
+
+                        subcategorySelect.classList.add('hide');
+                    }, 1);
+                }, false);
 
                 createElement('BUTTON', {
                     parent: detailsView,
@@ -1160,6 +1241,8 @@
                     });
 
                     categories.forEach(category => {
+                        if (category === 'misc') return;
+
                         createElement('DIV', {
                             parent: categorySelect,
                             elementClass: 'select-item',
@@ -1214,6 +1297,8 @@
                     }
 
                     subcategories.forEach(subcategory => {
+                        if (subcategory === 'misc') return;
+
                         createElement('DIV', {
                             parent: subcategorySelect,
                             elementClass: 'select-item',
