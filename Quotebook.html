@@ -1389,8 +1389,6 @@
 
                     addView.classList.add('hide');
                     mainView.classList.remove('hide');
-
-                    library.renderList();
                 }]
             });
 
@@ -1422,8 +1420,6 @@
                 elementClass: 'back-arrow',
                 text: '&#8592;',
                 eventListener: ['click', () => {
-                    library.renderList();
-
                     window.scrollTo(0, 0);
 
                     settingsView.classList.add('hide');
