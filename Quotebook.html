@@ -732,24 +732,11 @@
                 this.quotes = {};
 
                 list.forEach(item => {
-                    const matches = [
-                        item.author,
-                        item.reference,
-                        item.text,
-                        item.link,
-                        item.category,
-                        item.subcategory
-                    ].some(field => {
-                        return new RegExp(query, 'ig').test(field);
-                    });
-
-                    if (!query || matches) {
-                        this.addQuote(item);
-                    }
+                    this.addQuote(item);
                 });
             }
 
-            loadStorage(query) {
+            loadStorage() {
                 const storage = window.localStorage.getItem('quotebook-library');
                 let data;
                 
@@ -759,7 +746,7 @@
                     data = [];
                 }
 
-                this.loadList(data, query);
+                this.loadList(data);
             }
 
             getRaw() {
@@ -782,21 +769,26 @@
                 window.localStorage.setItem('quotebook-library', JSON.stringify(data));
             }
 
-            renderList() {
+            renderList(query) {
                 while (quotesList.firstChild) {
                     quotesList.firstChild.remove();
                 }
 
                 Object.keys(this.quotes).sort().forEach(category => {
-                    createElement('H1', {
+                    let displayCategory = false;
+
+                    const categoryHeader = createElement('H1', {
                         parent: quotesList,
                         elementClass: 'quotes-category',
                         text: category === 'zzzmisc' ? 'Miscellaneous' : category
                     });
 
                     Object.keys(this.quotes[category]).sort().forEach(subcategory => {
+                        let subcategoryHeader;
+                        let displaySubcategory = false;
+
                         if (subcategory !== '0misc') {
-                            createElement('H2', {
+                            subcategoryHeader = createElement('H2', {
                                 parent: quotesList,
                                 elementClass: 'quotes-subcategory',
                                 text: subcategory
@@ -804,9 +796,37 @@
                         }
 
                         Object.values(this.quotes[category][subcategory]).forEach(quote => {
-                            quote.renderRow();
+                            const matches = [
+                                quote.author,
+                                quote.reference,
+                                quote.text,
+                                quote.link,
+                                quote.category,
+                                quote.subcategory
+                            ].some(field => {
+                                return new RegExp(query, 'ig').test(field);
+                            });
+
+                            if (!query || matches) {
+                                quote.renderRow();
+                                displayCategory = true;
+                                
+                                if (subcategory !== '0misc') {
+                                    displaySubcategory = true;
+                                }
+                            }
                         });
+
+                        if (!displaySubcategory) {
+                            if (subcategory !== '0misc') {
+                                subcategoryHeader.remove();
+                            }
+                        }
                     });
+
+                    if (!displayCategory) {
+                        categoryHeader.remove();
+                    }
                 });
             }
         }
@@ -894,7 +914,6 @@
                 window.scrollTo(0, 0);
 
                 searchInput.value = '';
-                this.library.loadStorage();
 
                 while (detailsView.firstChild) {
                     detailsView.firstChild.remove();
@@ -1156,7 +1175,6 @@
 
         quoteButton.addEventListener('click', () => {
             searchInput.value = '';
-            library.loadStorage();
 
             while (addView.firstChild) {
                 addView.firstChild.remove();
@@ -1385,13 +1403,12 @@
         }, false);
 
         searchInput.addEventListener('keyup', () => {
-            library.loadStorage(searchInput.value);
-            library.renderList();
+            library.loadStorage();
+            library.renderList(searchInput.value);
         }, false);
 
         settingsButton.addEventListener('click', () => {
             searchInput.value = '';
-            library.loadStorage();
 
             window.scrollTo(0, 0);
 
