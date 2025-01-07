@@ -648,7 +648,7 @@
             const scripturePattern = /^(?<book>(?:\d )?(?:[A-Za-z& ]+)+) (?<chapter>\d+)(?::(?<start>\d+)(?:-(?<end>\d+))?)?$/i;
             let link = '';
 
-            if (scripturePattern.test(reference)) {
+            if (reference.length <= 25 && scripturePattern.test(reference)) {
                 const { book, chapter, start, end } = reference.match(scripturePattern).groups;
 
                 for (const scripture in scriptures) {
@@ -800,7 +800,6 @@
                                 quote.author,
                                 quote.reference,
                                 quote.text,
-                                quote.link,
                                 quote.category,
                                 quote.subcategory
                             ].some(field => {
@@ -1405,6 +1404,8 @@
         searchInput.addEventListener('keyup', () => {
             library.loadStorage();
             library.renderList(searchInput.value);
+
+            window.scrollTo(0, 0);
         }, false);
 
         settingsButton.addEventListener('click', () => {
