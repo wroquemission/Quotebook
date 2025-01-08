@@ -294,6 +294,17 @@
             padding-bottom: 3em;
         }
 
+        .details-copy {
+            width: 80%;
+            height: 2.5em;
+            border: none;
+            outline: none;
+            font-size: 1.2em;
+            background: #000;
+            color: white;
+            margin-top: 2em;
+        }
+
         .details-delete {
             width: 80%;
             height: 2.5em;
@@ -302,7 +313,7 @@
             font-size: 1.2em;
             background: #ff5757;
             color: white;
-            margin-top: 2em;
+            margin-top: 1em;
         }
 
         #details-delete-wrapper {
@@ -1282,6 +1293,30 @@
 
                 createElement('BUTTON', {
                     parent: detailsView,
+                    elementClass: 'details-copy',
+                    text: 'Copy',
+                    eventListener: ['click', () => {
+                        let text = this.text;
+
+                        const reference = [this.author, this.reference].filter(x => x).join(', ');
+
+                        if (reference) {
+                            text += ` (${reference})`;
+                        }
+
+                        navigator.clipboard.writeText(text);
+
+                        window.scrollTo(0, 0);
+
+                        this.library.renderList();
+
+                        mainView.classList.remove('hide');
+                        detailsView.classList.add('hide');
+                    }]
+                });
+
+                createElement('BUTTON', {
+                    parent: detailsView,
                     elementClass: 'details-delete',
                     text: 'Delete',
                     eventListener: ['click', () => {
@@ -1289,6 +1324,8 @@
                             if (response) {
                                 this.library.removeQuote(this);
                                 this.library.renderList();
+
+                                window.scrollTo(0, 0);
 
                                 mainView.classList.remove('hide');
                                 detailsView.classList.add('hide');
