@@ -1304,7 +1304,11 @@
                             text += ` (${reference})`;
                         }
 
-                        navigator.clipboard.writeText(text);
+                        quoteInput.innerText = text;
+                        quoteInput.select();
+                        quoteInput.setSelectionRange(0, 99999);
+
+                        document.execCommand('copy');
 
                         window.scrollTo(0, 0);
 
