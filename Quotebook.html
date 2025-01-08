@@ -122,6 +122,45 @@
             text-decoration: none;
         }
 
+        button.page-button {
+            height: 1.4em;
+            width: 1.5em;
+            font-size: 3em;
+            background: none;
+            border: none;
+            color: #000;
+        }
+
+        .page-button-wrapper {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            margin-top: 1em;
+        }
+
+        span.page-button-text {
+            position: relative;
+            top: -0.1em;
+        }
+
+        .filler {
+            flex-grow: 1;
+        }
+
+        button.page-button.page-button-right {
+            text-align: right;
+        }
+
+        button.page-button.page-button-left {
+            text-align: left;
+        }
+
+        .disabled {
+            color: #c7c7c7 !important;
+        }
+
         button {
             -webkit-tap-highlight-color: transparent;
             outline: none;
@@ -484,6 +523,8 @@
             'Japanese': 'jpn'
         };
 
+        const defaultPageLimit = 30;
+
         const scriptures = {
             ot: {
                 Genesis: 'gen',
@@ -676,6 +717,10 @@
         class Library {
             constructor() {
                 this.quotes = {};
+                this.quotesCount = 0;
+
+                this.page = 0;
+                this.pageLimit = window.localStorage.getItem('settings-page-limit') || defaultPageLimit;
             }
 
             addQuote(data) {
@@ -708,6 +753,8 @@
                 }
 
                 this.quotes[category][subcategory].push(quote);
+
+                this.quotesCount++;
             }
 
             removeQuote(quote) {
@@ -726,6 +773,8 @@
                 }
 
                 this.saveStorage();
+
+                this.quotesCount--;
             }
 
             loadList(list, query) {
@@ -774,7 +823,18 @@
                     quotesList.firstChild.remove();
                 }
 
-                Object.keys(this.quotes).sort().forEach(category => {
+                if (!Object.keys(this.quotes).length) {
+                    return;
+                }
+
+                const lowerLimit = this.page * this.pageLimit;
+                const upperLimit = (this.page + 1) * this.pageLimit;
+
+                let count = 0;
+                let nextExists = false;
+                let lastRound = false;
+
+                for (const category of Object.keys(this.quotes).sort()) {
                     let displayCategory = false;
 
                     const categoryHeader = createElement('H1', {
@@ -795,7 +855,15 @@
                             });
                         }
 
-                        Object.values(this.quotes[category][subcategory]).forEach(quote => {
+                        const quotes = Object.values(this.quotes[category][subcategory]);
+
+                        for (let quoteIndex = 0; quoteIndex < quotes.length; quoteIndex++) {
+                            if (count >= upperLimit) {
+                                lastRound = true;
+                            }
+
+                            const quote = quotes[quoteIndex];
+
                             const matches = [
                                 quote.author,
                                 quote.reference,
@@ -807,14 +875,23 @@
                             });
 
                             if (!query || matches) {
-                                quote.renderRow();
-                                displayCategory = true;
-                                
-                                if (subcategory !== '0misc') {
-                                    displaySubcategory = true;
+                                if (lastRound) {
+                                    nextExists = true;
+                                    break;
+                                } else {
+                                    count++;
+
+                                    if (count <= lowerLimit) continue;
+
+                                    quote.renderRow();
+                                    displayCategory = true;
+                                    
+                                    if (subcategory !== '0misc') {
+                                        displaySubcategory = true;
+                                    }
                                 }
                             }
-                        });
+                        }
 
                         if (!displaySubcategory) {
                             if (subcategory !== '0misc') {
@@ -826,6 +903,62 @@
                     if (!displayCategory) {
                         categoryHeader.remove();
                     }
+                }
+
+                const pageButtonWrapper = createElement('DIV', {
+                    parent: quotesList,
+                    elementClass: 'page-button-wrapper'
+                });
+
+                const leftButton = createElement('BUTTON', {
+                    parent: pageButtonWrapper,
+                    elementClass: ['page-button', 'page-button-left'],
+                    eventListener: ['click', () => {
+                        if (this.page > 0) {
+                            this.page--;
+                            this.renderList(query);
+
+                            window.scrollTo(0, 0);
+                        }
+                    }]
+                });
+
+                if (this.page === 0) {
+                    leftButton.classList.add('disabled');
+                }
+
+                createElement('SPAN', {
+                    parent: leftButton,
+                    elementClass: 'page-button-text',
+                    text: '&#8592;'
+                });                
+
+                createElement('DIV', {
+                    parent: pageButtonWrapper,
+                    elementClass: 'filler'
+                });
+
+                const rightButton = createElement('BUTTON', {
+                    parent: pageButtonWrapper,
+                    elementClass: ['page-button', 'page-button-right'],
+                    eventListener: ['click', () => {
+                        if (nextExists) {
+                            this.page++;
+                            this.renderList(query);
+
+                            window.scrollTo(0, 0);
+                        }
+                    }]
+                });
+
+                if (!nextExists) {
+                    rightButton.classList.add('disabled');
+                }
+                
+                createElement('SPAN', {
+                    parent: rightButton,
+                    elementClass: 'page-button-text',
+                    text: '&#8594;'
                 });
             }
         }
@@ -1387,6 +1520,8 @@
                 eventListener: ['click', () => {
                     window.scrollTo(0, 0);
 
+                    library.renderList();
+
                     addView.classList.add('hide');
                     mainView.classList.remove('hide');
                 }]
@@ -1401,6 +1536,7 @@
 
         searchInput.addEventListener('keyup', () => {
             library.loadStorage();
+            library.page = 0;
             library.renderList(searchInput.value);
 
             window.scrollTo(0, 0);
@@ -1420,6 +1556,8 @@
                 elementClass: 'back-arrow',
                 text: '&#8592;',
                 eventListener: ['click', () => {
+                    library.renderList();
+
                     window.scrollTo(0, 0);
 
                     settingsView.classList.add('hide');
@@ -1483,6 +1621,33 @@
                     languageSelect.classList.add('hide');
                 }, 1);
             }, false);
+
+            createElement('H2', {
+                parent: settingsView,
+                text: 'Page Limit',
+                elementClass: 'settings-header'
+            });
+
+            const pageLimitInput = createElement('INPUT', {
+                parent: settingsView,
+                elementClass: 'language-input',
+                attributes: {
+                    value: window.localStorage.getItem('settings-page-limit') || defaultPageLimit,
+                    type: 'number'
+                },
+                eventListener: ['change', () => {
+                    const limit = Math.abs(parseInt(pageLimitInput.value));
+
+                    if (limit) {
+                        library.pageLimit = limit;
+                        window.localStorage.setItem('settings-page-limit', limit);
+                    } else {
+                        pageLimitInput.value = defaultPageLimit;
+                        library.pageLimit = defaultPageLimit;
+                        window.localStorage.setItem('settings-page-limit', defaultPageLimit);
+                    }
+                }]
+            });
 
             createElement('H2', {
                 parent: settingsView,
