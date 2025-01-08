@@ -1173,23 +1173,25 @@
 
                         let categories = Object.keys(this.library.quotes).filter(category => {
                             return category.toLowerCase().startsWith(categoryInput.value.toLowerCase());
-                        }).sort();
-
-                        categories.forEach(category => {
-                            if (category === 'zzzmisc') return;
-
-                            createElement('DIV', {
-                                parent: categorySelect,
-                                elementClass: 'select-item',
-                                text: category,
-                                eventListener: ['click', () => {
-                                    categoryInput.value = category;
-                                }]
-                            });
                         });
 
-                        categorySelect.classList.remove('hide');
-                        categorySelect.style.top = categoryInput.offsetTop + 70 + 'px';
+                        categories = categories.filter(category => category !== 'zzzmisc').sort();
+
+                        if (categories.length) {
+                            categories.forEach(category => {
+                                createElement('DIV', {
+                                    parent: categorySelect,
+                                    elementClass: 'select-item',
+                                    text: category,
+                                    eventListener: ['click', () => {
+                                        categoryInput.value = category;
+                                    }]
+                                });
+                            });
+
+                            categorySelect.classList.remove('hide');
+                            categorySelect.style.top = categoryInput.offsetTop + 70 + 'px';
+                        }
                     }]
                 });
 
@@ -1237,26 +1239,28 @@
                             });
                         }
 
-                        subcategories.sort().forEach(subcategory => {
-                            if (subcategory === '0misc') return;
+                        subcategories = subcategories.filter(subcategory => subcategory !== '0misc').sort();
 
-                            createElement('DIV', {
-                                parent: subcategorySelect,
-                                elementClass: 'select-item',
-                                text: subcategory,
-                                eventListener: ['click', () => {
-                                    subcategoryInput.value = subcategory;
+                        if (subcategories.length) {
+                            subcategories.forEach(subcategory => {
+                                createElement('DIV', {
+                                    parent: subcategorySelect,
+                                    elementClass: 'select-item',
+                                    text: subcategory,
+                                    eventListener: ['click', () => {
+                                        subcategoryInput.value = subcategory;
 
-                                    this.subcategory = subcategoryInput.value || '0misc';
-                                    this.library.saveStorage();
-                                    this.library.loadStorage();
-                                    this.library.renderList();
-                                }]
+                                        this.subcategory = subcategoryInput.value || '0misc';
+                                        this.library.saveStorage();
+                                        this.library.loadStorage();
+                                        this.library.renderList();
+                                    }]
+                                });
                             });
-                        });
 
-                        subcategorySelect.classList.remove('hide');
-                        subcategorySelect.style.top = subcategoryInput.offsetTop - 12 - subcategorySelect.offsetHeight + 'px';
+                            subcategorySelect.classList.remove('hide');
+                            subcategorySelect.style.top = subcategoryInput.offsetTop - 12 - subcategorySelect.offsetHeight + 'px';
+                        }
                     }]
                 });
 
@@ -1394,23 +1398,25 @@
 
                     let categories = Object.keys(library.quotes).filter(category => {
                         return category.toLowerCase().startsWith(categoryInput.value.toLowerCase());
-                    }).sort();
-
-                    categories.forEach(category => {
-                        if (category === 'zzzmisc') return;
-
-                        createElement('DIV', {
-                            parent: categorySelect,
-                            elementClass: 'select-item',
-                            text: category,
-                            eventListener: ['click', () => {
-                                categoryInput.value = category;
-                            }]
-                        });
                     });
 
-                    categorySelect.classList.remove('hide');
-                    categorySelect.style.top = categoryInput.offsetTop + 70 + 'px';
+                    categories = categories.filter(category => category !== 'zzzmisc').sort();
+
+                    if (categories.length) {
+                        categories.forEach(category => {
+                            createElement('DIV', {
+                                parent: categorySelect,
+                                elementClass: 'select-item',
+                                text: category,
+                                eventListener: ['click', () => {
+                                    categoryInput.value = category;
+                                }]
+                            });
+                        });
+
+                        categorySelect.classList.remove('hide');
+                        categorySelect.style.top = categoryInput.offsetTop + 70 + 'px';
+                    }
                 }]
             });
 
@@ -1452,21 +1458,23 @@
                         });
                     }
 
-                    subcategories.sort().forEach(subcategory => {
-                        if (subcategory === '0misc') return;
+                    subcategories = subcategories.filter(subcategory => subcategory !== '0misc').sort();
 
-                        createElement('DIV', {
-                            parent: subcategorySelect,
-                            elementClass: 'select-item',
-                            text: subcategory,
-                            eventListener: ['click', () => {
-                                subcategoryInput.value = subcategory;
-                            }]
+                    if (subcategories.length) {
+                        subcategories.forEach(subcategory => {
+                            createElement('DIV', {
+                                parent: subcategorySelect,
+                                elementClass: 'select-item',
+                                text: subcategory,
+                                eventListener: ['click', () => {
+                                    subcategoryInput.value = subcategory;
+                                }]
+                            });
                         });
-                    });
 
-                    subcategorySelect.classList.remove('hide');
-                    subcategorySelect.style.top = subcategoryInput.offsetTop - 12 - subcategorySelect.offsetHeight + 'px';
+                        subcategorySelect.classList.remove('hide');
+                        subcategorySelect.style.top = subcategoryInput.offsetTop - 12 - subcategorySelect.offsetHeight + 'px';
+                    }
                 }]
             });
 
