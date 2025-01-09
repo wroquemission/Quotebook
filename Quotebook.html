@@ -476,13 +476,16 @@
             user-select: none;
         }
     </style>
+    <script>
+        history.scrollRestoration = 'manual';
+    </script>
 </head>
 
 <body>
     <div id="main-view">
         <div id="search-header">
             <button id="settings-button"></button>
-            <input id="search-input" type="text" placeholder="Search...">
+            <input id="search-input" type="text" placeholder="Search..." autocomplete="off">
         </div>
         <div id="quotes-list"> </div>
         <button id="quote-button"></button>
@@ -776,7 +779,7 @@
                 this.quotesCount--;
             }
 
-            loadList(list, query) {
+            loadList(list) {
                 this.quotes = {};
 
                 list.forEach(item => {
@@ -1042,9 +1045,7 @@
             }
 
             renderDetails() {
-                window.scrollTo(0, 0);
-
-                searchInput.value = '';
+                let originalScroll = window.scrollY;
 
                 while (detailsView.firstChild) {
                     detailsView.firstChild.remove();
@@ -1055,12 +1056,12 @@
                     elementClass: 'back-arrow',
                     text: '&#8592;',
                     eventListener: ['click', () => {
-                        this.library.renderList();
-
-                        window.scrollTo(0, 0);
+                        this.library.renderList(searchInput.value);
 
                         detailsView.classList.add('hide');
                         mainView.classList.remove('hide');
+
+                        window.scrollTo(0, originalScroll);
                     }]
                 });
 
@@ -1315,12 +1316,12 @@
                         confirmPrompt('Are you sure?', 'Yes', 'No', detailsView).then(response => {
                             if (response) {
                                 this.library.removeQuote(this);
-                                this.library.renderList();
-
-                                window.scrollTo(0, 0);
+                                this.library.renderList(searchInput.value);
 
                                 mainView.classList.remove('hide');
                                 detailsView.classList.add('hide');
+
+                                window.scrollTo(0, originalScroll);
                             }
                         });
                     }]
@@ -1339,7 +1340,7 @@
         library.renderList();
 
         quoteButton.addEventListener('click', () => {
-            searchInput.value = '';
+            let originalScroll = window.scrollY;
 
             while (addView.firstChild) {
                 addView.firstChild.remove();
@@ -1540,13 +1541,13 @@
 
                         library.addQuote(quote);
                         library.saveStorage();
-                        library.renderList();
+                        library.renderList(searchInput.value);
                     }
-
-                    window.scrollTo(0, 0);
 
                     addView.classList.add('hide');
                     mainView.classList.remove('hide');
+
+                    window.scrollTo(0, originalScroll);
                 }]
             });
 
@@ -1555,12 +1556,12 @@
                 elementClass: 'add-button',
                 text: 'Discard',
                 eventListener: ['click', () => {
-                    window.scrollTo(0, 0);
-
-                    library.renderList();
+                    library.renderList(searchInput.value);
 
                     addView.classList.add('hide');
                     mainView.classList.remove('hide');
+
+                    window.scrollTo(0, originalScroll);
                 }]
             });
 
@@ -1580,7 +1581,7 @@
         }, false);
 
         settingsButton.addEventListener('click', () => {
-            searchInput.value = '';
+            let originalScroll = window.scrollY;
 
             window.scrollTo(0, 0);
 
@@ -1593,12 +1594,12 @@
                 elementClass: 'back-arrow',
                 text: '&#8592;',
                 eventListener: ['click', () => {
-                    library.renderList();
-
-                    window.scrollTo(0, 0);
+                    library.renderList(searchInput.value);
 
                     settingsView.classList.add('hide');
                     mainView.classList.remove('hide');
+
+                    window.scrollTo(0, originalScroll);
                 }]
             });
 
