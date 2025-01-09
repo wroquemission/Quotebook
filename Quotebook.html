@@ -330,7 +330,7 @@
 
         #confirmation-back-arrow {
             font-size: 5em;
-            color: #cbcbcb;
+            color: #000;
             width: 1.5em;
             text-align: center;
             margin: 0;
@@ -352,7 +352,7 @@
             font-family: 'Open Sans', 'Helvetica', sans-serif;
             font-size: 2.2em;
             font-weight: 400;
-            color: #737373;
+            color: #000;
             text-align: center;
         }
 
@@ -361,19 +361,18 @@
             width: 6em;
             height: 2.3em;
             margin: .7em;
-            border-radius: .3em;
             font-weight: 400;
         }
 
-        .save-button {
-            border: solid .15em #737373;
+        .confirm-button {
+            border: solid .15em #ff5757;
             background: white;
-            color: #636363;
+            color: #ff5757;
         }
 
         .discard-button {
-            border: solid .15em #737373;
-            background: #737373;
+            border: solid .15em #000;
+            background: #000;
             color: white;
         }
 
@@ -1126,7 +1125,7 @@
 
                 createElement('H1', {
                     parent: detailsView,
-                    text: 'Quote',
+                    text: 'Text',
                     elementClass: 'details-input-label'
                 });
 
@@ -1394,7 +1393,7 @@
 
             createElement('H1', {
                 parent: addView,
-                text: 'Quote',
+                text: 'Text',
                 elementClass: 'add-input-label'
             });
 
@@ -1832,7 +1831,7 @@
                 createElement('BUTTON', {
                     parent: wrapper,
                     ID: 'confirmation-yes',
-                    elementClass: 'save-button',
+                    elementClass: 'confirm-button',
                     text: yesLabel,
                     eventListener: ['click', () => {
                         view.classList.remove('hide');
