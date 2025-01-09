@@ -1724,11 +1724,25 @@
                             const reader = new FileReader();
 
                             reader.onload = e => {
-                                confirmPrompt('This will overwrite your current library.', 'Ok', 'Cancel', settingsView).then(response => {
-                                    if (response) {
+                                confirmPrompt('Overwrite current library?', 'Overwrite', 'Add', settingsView).then(response => {
+                                    if (response === true) {
                                         const contents = e.target.result;
 
                                         library.loadList(JSON.parse(contents));
+                                        library.renderList();
+                                        library.saveStorage();
+
+                                        window.scrollTo(0, 0);
+
+                                        settingsView.classList.add('hide');
+                                        mainView.classList.remove('hide');
+                                    } else if (response === false) {
+                                        const contents = JSON.parse(e.target.result);
+
+                                        contents.forEach(item => {
+                                            this.addQuote(item);
+                                        });
+
                                         library.renderList();
                                         library.saveStorage();
 
