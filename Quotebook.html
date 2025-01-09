@@ -1299,12 +1299,12 @@
 
                         document.execCommand('copy');
 
-                        window.scrollTo(0, 0);
-
-                        this.library.renderList();
+                        this.library.renderList(searchInput.value);
 
                         mainView.classList.remove('hide');
                         detailsView.classList.add('hide');
+
+                        window.scrollTo(0, originalScroll);
                     }]
                 });
 
