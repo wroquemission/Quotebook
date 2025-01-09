@@ -372,8 +372,8 @@
         }
 
         .discard-button {
-            border: solid .15em #ff5757;
-            background: #ff5757;
+            border: solid .15em #737373;
+            background: #737373;
             color: white;
         }
 
@@ -1724,9 +1724,11 @@
                             const reader = new FileReader();
 
                             reader.onload = e => {
-                                confirmPrompt('Overwrite current library?', 'Overwrite', 'Add', settingsView).then(response => {
+                                confirmPrompt('Replace current library or just add?', 'Overwrite', 'Add', settingsView).then(response => {
                                     if (response === true) {
                                         const contents = e.target.result;
+
+                                        library.page = 0;
 
                                         library.loadList(JSON.parse(contents));
                                         library.renderList();
@@ -1740,8 +1742,10 @@
                                         const contents = JSON.parse(e.target.result);
 
                                         contents.forEach(item => {
-                                            this.addQuote(item);
+                                            library.addQuote(item);
                                         });
+
+                                        library.page = 0;
 
                                         library.renderList();
                                         library.saveStorage();
