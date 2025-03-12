@@ -1572,12 +1572,16 @@
             mainView.classList.add('hide');
         }, false);
 
-        searchInput.addEventListener('keyup', () => {
-            library.loadStorage();
-            library.page = 0;
-            library.renderList(searchInput.value);
+        searchInput.addEventListener('keyup', e => {
+            if (e.keyCode === 13) {
+                searchInput.blur();
+            } else {
+                library.loadStorage();
+                library.page = 0;
+                library.renderList(searchInput.value);
 
-            window.scrollTo(0, 0);
+                window.scrollTo(0, 0);
+            }
         }, false);
 
         settingsButton.addEventListener('click', () => {
